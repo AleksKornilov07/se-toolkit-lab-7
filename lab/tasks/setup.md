@@ -104,13 +104,13 @@
 
 1. [Fork the course instructors' repo](../../wiki/github.md#fork-a-repo).
 
-   The course instructors' repo [URL](../../wiki/computer-networks.md#url) is <https://github.com/inno-se-toolkit/se-toolkit-lab-6>.
+   The course instructors' repo [URL](../../wiki/computer-networks.md#url) is <https://github.com/inno-se-toolkit/se-toolkit-lab-7>.
 
 #### 1.3.3. (UPD) Go to your fork
 
 1. [Go to your fork](../../wiki/github.md#go-to-your-fork).
 
-   The [URL](../../wiki/computer-networks.md#url) of your fork should look like `https://github.com/<your-github-username>/se-toolkit-lab-6`.
+   The [URL](../../wiki/computer-networks.md#url) of your fork should look like `https://github.com/<your-github-username>/se-toolkit-lab-7`.
 
 #### 1.3.4. (UPD) Enable issues
 
@@ -182,7 +182,7 @@
 1. [Go to your fork](#133-upd-go-to-your-fork).
 2. Copy [`<your-fork-url>`](../../wiki/github.md#your-fork-url).
 
-   It should look like `https://github.com/<your-github-username>/se-toolkit-lab-6`.
+   It should look like `https://github.com/<your-github-username>/se-toolkit-lab-7`.
 
    See [`<your-github-username>`](../../wiki/github.md#your-github-username).
 
@@ -191,7 +191,7 @@
 1. [Clone your fork](../../wiki/git-vscode.md#clone-the-repository):
 
    - Replace `<repo-url>` with [`<your-fork-url>`](../../wiki/github.md#your-fork-url).
-   - Replace `<repo-name>` with `se-toolkit-lab-6`.
+   - Replace `<repo-name>` with `se-toolkit-lab-7`.
 
 ### 1.7. (UPD) Open the cloned repo and set up `VS Code` (LOCAL)
 
@@ -200,7 +200,7 @@
 > Otherwise, your setup will be broken.
 
 1. [Open in `VS Code` the directory](../../wiki/vs-code.md#open-the-directory):
-   `se-toolkit-lab-6`.
+   `se-toolkit-lab-7`.
 2. [Check the current shell in the `VS Code Terminal`](../../wiki/vs-code.md#check-the-current-shell-in-the-vs-code-terminal).
 3. [Install the recommended `VS Code` extensions](../../wiki/vs-code.md#install-the-recommended-vs-code-extensions).
 

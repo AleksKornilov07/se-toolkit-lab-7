@@ -8,19 +8,22 @@
     - [1.1.4. Add a classmate as a collaborator](#114-add-a-classmate-as-a-collaborator)
     - [1.1.5. Protect your `main` branch](#115-protect-your-main-branch)
   - [1.2. Clone your fork and set up the environment](#12-clone-your-fork-and-set-up-the-environment)
-  - [1.3. Start the services locally](#13-start-the-services-locally)
-  - [1.4. Populate the database](#14-populate-the-database)
-  - [1.5. Verify the local deployment](#15-verify-the-local-deployment)
-  - [1.6. Deploy to your VM](#16-deploy-to-your-vm)
-  - [1.7. Set up LLM access (Qwen Code API)](#17-set-up-llm-access-qwen-code-api)
-  - [1.8. Coding agent](#18-coding-agent)
+  - [1.3. Stop Lab 6 services](#13-stop-lab-6-services)
+  - [1.4. Start the services locally](#14-start-the-services-locally)
+  - [1.5. Populate the database](#15-populate-the-database)
+  - [1.6. Verify the local deployment](#16-verify-the-local-deployment)
+  - [1.7. Deploy to your VM](#17-deploy-to-your-vm)
+  - [1.8. Set up SSH for the autochecker](#18-set-up-ssh-for-the-autochecker)
+  - [1.9. Set up LLM access (Qwen Code API)](#19-set-up-llm-access-qwen-code-api)
+  - [1.10. Get a Telegram bot token](#110-get-a-telegram-bot-token)
+  - [1.11. Coding agent](#111-coding-agent)
 
 ## 1. Required steps
 
 > [!NOTE]
 > This lab builds on the same tools and setup from previous labs.
-> If you completed Labs 4–5, most tools are already installed.
-> The main changes are: a new repo, local deployment, and setting up LLM access.
+> If you completed Labs 4–6, most tools are already installed.
+> The main changes are: a new repo, cleaning up Lab 6, deploying, and getting a Telegram bot token.
 
 > [!NOTE]
 > This lab needs your university email and GitHub alias in the Autochecker bot <https://t.me/auchebot>. If you haven't registered, do so now. If you want to change something, contact your TA.
@@ -29,13 +32,13 @@
 
 #### 1.1.1. Fork the course instructors' repo
 
-1. Fork the [lab's repo](https://github.com/inno-se-toolkit/se-toolkit-lab-6).
+1. Fork the [lab's repo](https://github.com/inno-se-toolkit/se-toolkit-lab-7).
 
 We refer to your fork as `fork` and to the original repo as `upstream`.
 
 #### 1.1.2. Go to your fork
 
-1. Go to your fork, it should look like `https://github.com/<your-github-username>/se-toolkit-lab-6`.
+1. Go to your fork, it should look like `https://github.com/<your-github-username>/se-toolkit-lab-7`.
 
 #### 1.1.3. Enable issues
 
@@ -55,12 +58,12 @@ We refer to your fork as `fork` and to the original repo as `upstream`.
 1. Clone your fork to your local machine:
 
    ```terminal
-   git clone https://github.com/<your-github-username>/se-toolkit-lab-6
+   git clone https://github.com/<your-github-username>/se-toolkit-lab-7
    ```
 
 2. Open the forked repo in `VS Code`.
 
-3. Go to `VS Code Terminal`, [check that the current directory is `se-toolkit-lab-6`](../../wiki/shell.md#check-the-current-directory-is-directory-name), and install `Python` dependencies:
+3. Go to `VS Code Terminal`, [check that the current directory is `se-toolkit-lab-7`](../../wiki/shell.md#check-the-current-directory-is-directory-name), and install `Python` dependencies:
 
    ```terminal
    uv sync --dev
@@ -87,13 +90,37 @@ We refer to your fork as `fork` and to the original repo as `upstream`.
    > [!IMPORTANT]
    > The credentials must match your autochecker bot registration.
 
-6. Set `LMS_API_KEY` — this is the **backend API key** that protects your LMS endpoints (used for `Authorization: Bearer` in Swagger and the frontend). It is **not** the LLM key — that comes later in Task 1.
+6. Set `LMS_API_KEY` — this is the **backend API key** that protects your LMS endpoints (used for `Authorization: Bearer` in Swagger and the frontend). It is **not** the LLM key — that comes later.
 
    ```text
    LMS_API_KEY=set-it-to-something-and-remember-it
    ```
 
-### 1.3. Start the services locally
+### 1.3. Stop Lab 6 services
+
+> [!IMPORTANT]
+> Labs 6 and 7 use the same ports (42001–42004). You **must** stop Lab 6 containers before starting Lab 7.
+
+**Locally:**
+
+```terminal
+cd ../se-toolkit-lab-6
+docker compose --env-file .env.docker.secret down
+cd ../se-toolkit-lab-7
+```
+
+**On your VM** (do this now so you don't forget):
+
+```terminal
+ssh <your-vm-username>@<your-vm-ip>
+cd ~/se-toolkit-lab-6
+docker compose --env-file .env.docker.secret down
+```
+
+> [!NOTE]
+> You must use `--env-file .env.docker.secret` — without it, `docker compose down` will fail because the compose file references required variables.
+
+### 1.4. Start the services locally
 
 1. (`Windows`/`macOS`) Make sure [Docker Desktop](../../wiki/docker.md#start-docker) is running.
 
@@ -123,15 +150,7 @@ We refer to your fork as `fork` and to the original repo as `upstream`.
 >
 > **Port conflict (`port is already allocated`).**
 >
-> Labs 5 and 6 use the same ports (42001, 42002, 42004). If you have Lab 5 containers running, stop them first:
->
-> ```terminal
-> cd ../se-toolkit-lab-5
-> docker compose --env-file .env.docker.secret down
-> cd ../se-toolkit-lab-6
-> ```
->
-> If that doesn't help, [clean up `Docker`](../../wiki/docker.md#clean-up-docker), then run the `docker compose up` command again.
+> Make sure you stopped Lab 6 services first (step 1.3). If that doesn't help, [clean up `Docker`](../../wiki/docker.md#clean-up-docker), then run the `docker compose up` command again.
 >
 > **Containers exit immediately.**
 >
@@ -160,8 +179,18 @@ We refer to your fork as `fork` and to the original repo as `upstream`.
 > ```
 >
 > Then run the `docker compose up` command again.
+>
+> **Docker Hub rate limits (`Too many requests`).**
+>
+> If you're building outside the university network and hit Docker Hub rate limits, set the registry prefix to empty in `.env.docker.secret`:
+>
+> ```text
+> REGISTRY_PREFIX=
+> ```
+>
+> This is only needed outside the university. On campus, the default harbor cache avoids rate limits.
 
-### 1.4. Populate the database
+### 1.5. Populate the database
 
 The database starts empty. You need to run the ETL pipeline to populate it with data from the autochecker API.
 
@@ -190,7 +219,10 @@ The database starts empty. You need to run the ETL pipeline to populate it with 
 
    You should get a non-empty array of items.
 
-### 1.5. Verify the local deployment
+> [!IMPORTANT]
+> Without this step, all analytics endpoints return empty results and your bot will have no data to work with.
+
+### 1.6. Verify the local deployment
 
 1. Open `http://localhost:42002/docs` in a browser.
 
@@ -209,28 +241,35 @@ The database starts empty. You need to run the ETL pipeline to populate it with 
 >
 > - The ETL sync completed successfully (step 1.5)
 > - You entered the correct API key in the frontend
-> - Try selecting a different lab in the dropdown (e.g., `lab-04`)
+> - Try selecting a different lab in the dropdown
 
-### 1.6. Deploy to your VM
+### 1.7. Deploy to your VM
 
-The autochecker tests your agent against your **deployed backend on your VM**. You need to deploy the same services there.
+The autochecker tests your bot against your **deployed backend on your VM**. You need to deploy the same services there.
 
 1. [Connect to the VM](../../wiki/ssh.md#connect-to-the-vm).
 
-2. Clone your fork on the VM:
+2. Make sure Lab 6 is stopped (if you haven't done this in step 1.3):
 
    ```terminal
-   git clone https://github.com/<your-github-username>/se-toolkit-lab-6 ~/se-toolkit-lab-6
+   cd ~/se-toolkit-lab-6 && docker compose --env-file .env.docker.secret down
+   cd ~
    ```
 
-3. Create the environment file:
+3. Clone your fork on the VM:
 
    ```terminal
-   cd ~/se-toolkit-lab-6
+   git clone https://github.com/<your-github-username>/se-toolkit-lab-7 ~/se-toolkit-lab-7
+   ```
+
+4. Create the environment file:
+
+   ```terminal
+   cd ~/se-toolkit-lab-7
    cp .env.docker.example .env.docker.secret
    ```
 
-4. Edit `.env.docker.secret` — set the same credentials as in your local file:
+5. Edit `.env.docker.secret` — set the same credentials as in your local file:
 
    ```terminal
    nano .env.docker.secret
@@ -238,7 +277,7 @@ The autochecker tests your agent against your **deployed backend on your VM**. Y
 
    Set `AUTOCHECKER_EMAIL`, `AUTOCHECKER_PASSWORD`, and `LMS_API_KEY` (use the same values as locally).
 
-5. Start the services:
+6. Start the services:
 
    ```terminal
    docker compose --env-file .env.docker.secret up --build -d
@@ -246,9 +285,9 @@ The autochecker tests your agent against your **deployed backend on your VM**. Y
 
    > <h3>Troubleshooting</h3>
    >
-   > The same troubleshooting advices as when [starting the services locally](#13-start-the-services-locally).
+   > The same troubleshooting advice as when [starting the services locally](#14-start-the-services-locally).
 
-6. Populate the database:
+7. Populate the database:
 
    ```terminal
    curl -X POST http://localhost:42002/pipeline/sync \
@@ -257,10 +296,10 @@ The autochecker tests your agent against your **deployed backend on your VM**. Y
      -d '{}'
    ```
 
-7. Verify the deployment:
+8. Verify the deployment:
 
    ```terminal
-   curl -s http://localhost:42002/items/ -H "Authorization: Bearer <your-LMS_API_KEY>" | jq .
+   curl -s http://localhost:42002/items/ -H "Authorization: Bearer <your-LMS_API_KEY>" | head -c 200
    ```
 
    You should see a JSON array of items.
@@ -268,57 +307,84 @@ The autochecker tests your agent against your **deployed backend on your VM**. Y
 > [!IMPORTANT]
 > Keep the services running on your VM. The autochecker will query your backend during evaluation.
 
-### 1.7. Set up LLM access (Qwen Code API)
+### 1.8. Set up SSH for the autochecker
 
-Your agent needs an LLM to answer questions. [Qwen Code](../../wiki/qwen.md#what-is-qwen-code) provides **1000 free requests per day** and works from Russia — no VPN or credit card needed.
+The autochecker needs to SSH into your VM as **your main user** to run checks (test your bot, verify deployment, etc.).
+
+> [!NOTE]
+> If you completed Lab 6 Task 3, this is already done. Verify by checking with the autochecker bot — if the setup check passes, skip this step.
+
+1. On your VM, add the autochecker's SSH public key:
+
+   ```terminal
+   mkdir -p ~/.ssh
+   echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKiL0DDQZw7L0Uf1c9cNlREY7IS6ZkIbGVWNsClqGNCZ se-toolkit-autochecker' >> ~/.ssh/authorized_keys
+   chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys
+   ```
+
+2. Register your VM username with the autochecker bot if you haven't already.
+
+   In the Telegram bot, when prompted for your VM username, run `whoami` on your VM and reply with the output.
+
+### 1.9. Set up LLM access (Qwen Code API)
+
+Your bot needs an LLM for the intent routing feature (Task 3). [Qwen Code](../../wiki/qwen.md#what-is-qwen-code) provides **1000 free requests per day** and works from Russia — no VPN or credit card needed.
+
+> [!NOTE]
+> If you set up the Qwen Code API in Lab 6, it should still be running on your VM. Verify:
+>
+> ```terminal
+> curl -s http://<your-vm-ip>:42005/v1/models -H "Authorization: Bearer <your-key>" | head -c 100
+> ```
+>
+> If this returns a JSON response, you're good — skip to the next step.
 
 1. [Set up the Qwen Code API on your VM](../../wiki/qwen-code-api.md#set-up-the-qwen-code-api-remote).
 
    After completing the setup, you will have the Qwen API running on your VM at `http://localhost:<qwen-api-port>/v1`.
 
-2. On your **local machine**, create the agent environment file:
-
-   ```terminal
-   cp .env.agent.example .env.agent.secret
-   ```
-
-3. Edit `.env.agent.secret`:
-
-   ```text
-   LLM_API_KEY=<your-QWEN_API_KEY>
-   LLM_API_BASE=http://<your-vm-ip-address>:<qwen-api-port>/v1
-   LLM_MODEL=qwen3-coder-plus
-   ```
-
-   Replace `<your-QWEN_API_KEY>`, `<your-vm-ip-address>`, and `<qwen-api-port>` with your values.
-
-4. Verify the connection from your local machine:
-
-   ```terminal
-   curl -s http://<your-vm-ip-address>:<qwen-api-port>/v1/chat/completions \
-     -H "Content-Type: application/json" \
-     -H "Authorization: Bearer <your-QWEN_API_KEY>" \
-     -d '{"model":"qwen3-coder-plus","messages":[{"role":"user","content":"What is 2+2?"}]}' \
-     | jq .
-   ```
-
 <details><summary><b>Alternative: OpenRouter (click to open)</b></summary>
 
-If you prefer [OpenRouter](https://openrouter.ai), register and get an API key. Then set in `.env.agent.secret`:
+If you prefer [OpenRouter](https://openrouter.ai), register and get an API key. Then use:
 
 ```text
-LLM_API_KEY=<your-openrouter-key>
+OPENROUTER_API_KEY=<your-openrouter-key>
 LLM_API_BASE=https://openrouter.ai/api/v1
 LLM_MODEL=meta-llama/llama-3.3-70b-instruct:free
 ```
 
 </details>
 
-### 1.8. Coding agent
+### 1.10. Get a Telegram bot token
+
+You need a Telegram bot token to run your bot client.
+
+1. Open Telegram and search for [@BotFather](https://t.me/BotFather).
+
+2. Send `/newbot`.
+
+3. Choose a **name** for your bot (e.g., `My LMS Bot`).
+
+4. Choose a **username** for your bot (must end in `bot`, e.g., `my_lms_lab7_bot`).
+
+5. BotFather will reply with a token like:
+
+   ```text
+   123456789:ABCdefGhIJKlmNoPQRsTUVwxyz
+   ```
+
+6. Save this token — you will put it in your `.env` as `BOT_TOKEN` when you start building the bot.
+
+> [!IMPORTANT]
+> Do not share your bot token or commit it to git. Add it to `.env` files that are in `.gitignore`.
+
+### 1.11. Coding agent
 
 > [!NOTE]
-> You should already have a coding agent from Lab 5.
+> You should already have a coding agent from previous labs.
 > If not, [set one up](../../wiki/coding-agents.md#choose-and-use-a-coding-agent).
+
+In this lab, you will use the coding agent (Qwen Code) extensively to plan, scaffold, and implement your Telegram bot. The agent is your development partner — learn to collaborate with it effectively.
 
 ----
 
