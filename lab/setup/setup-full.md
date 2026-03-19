@@ -147,10 +147,12 @@ See [tools](../../wiki/software-types.md#tool).
 
 #### 1.4.4. (UPD) Clean up `Docker`
 
-1. [Clean up `Docker`](../../wiki/docker.md#clean-up-docker).
+> [!NOTE]
+> Old containers and volumes from a previous lab version may conflict with the updated services.
+>
+> Stop running containers, remove stopped containers, and delete unused volumes so you start with a clean state.
 
-   **Note:** Old containers and volumes from a previous lab version may conflict with the updated services.
-   Stop running containers, remove stopped containers, and delete unused volumes so you start with a clean state.
+1. [Remove all containers](../../wiki/docker.md#remove-all-containers).
 
 #### 1.4.5. Set up `Git`
 
