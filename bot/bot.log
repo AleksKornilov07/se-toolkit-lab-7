@@ -1,5 +1,33 @@
 nohup: ignoring input
 Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
 Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8226868300)
-Received SIGTERM signal
-Received SIGTERM signal
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+Sleep for 1.416183 seconds and try again... (tryings = 1, bot id = 8226868300)
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+Sleep for 1.870413 seconds and try again... (tryings = 2, bot id = 8226868300)
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+Sleep for 2.434042 seconds and try again... (tryings = 3, bot id = 8226868300)
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+Sleep for 3.204813 seconds and try again... (tryings = 4, bot id = 8226868300)
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+Sleep for 4.145335 seconds and try again... (tryings = 5, bot id = 8226868300)
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+Sleep for 4.884619 seconds and try again... (tryings = 6, bot id = 8226868300)
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+Sleep for 4.874187 seconds and try again... (tryings = 7, bot id = 8226868300)
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+Sleep for 4.914617 seconds and try again... (tryings = 8, bot id = 8226868300)
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+Sleep for 5.012729 seconds and try again... (tryings = 9, bot id = 8226868300)
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+Sleep for 5.040835 seconds and try again... (tryings = 10, bot id = 8226868300)
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+Sleep for 5.102294 seconds and try again... (tryings = 11, bot id = 8226868300)
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+Sleep for 5.142628 seconds and try again... (tryings = 12, bot id = 8226868300)
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+Sleep for 4.849619 seconds and try again... (tryings = 13, bot id = 8226868300)
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+Sleep for 4.794499 seconds and try again... (tryings = 14, bot id = 8226868300)
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+Sleep for 5.261702 seconds and try again... (tryings = 15, bot id = 8226868300)
