@@ -50,11 +50,7 @@ async def run_test_mode(command: str) -> None:
         response = await handle_help()
     elif cmd == "/health":
         # Check backend health
-        is_healthy = await lms_client.health_check()
-        if is_healthy:
-            response = "✅ Bot is running. Backend connection: OK"
-        else:
-            response = "⚠️ Bot is running. Backend connection: FAILED"
+        response = await handle_health()
     elif cmd == "/labs":
         response = await handle_labs()
     elif cmd == "/scores":
