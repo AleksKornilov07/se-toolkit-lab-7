@@ -1,6 +1,6 @@
 """Command handlers package."""
 
-from handlers.base import (
+from .base import (
     handle_start,
     handle_help,
     handle_health,
