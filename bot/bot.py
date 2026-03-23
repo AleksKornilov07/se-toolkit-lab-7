@@ -12,6 +12,7 @@ import sys
 from typing import Optional
 
 from aiogram import Bot, Dispatcher, types
+from aiogram.client.default import DefaultBotProperties
 from aiogram.filters import Command, CommandStart
 
 from config import settings
@@ -94,7 +95,7 @@ async def run_test_mode(command: str) -> None:
 
 async def setup_bot() -> tuple[Bot, Dispatcher]:
     """Initialize bot and dispatcher."""
-    bot = Bot(token=settings.bot_token, parse_mode="HTML")
+    bot = Bot(token=settings.bot_token, default=DefaultBotProperties(parse_mode="HTML"))
     dp = Dispatcher()
     return bot, dp
 

@@ -10,7 +10,7 @@ async def handle_start() -> str:
         "/help - Show this help message\n"
         "/health - Check backend connection\n"
         "/labs - List available labs\n"
-        "/scores <lab> - Get your scores for a lab"
+        "/scores [lab] - Get your scores for a lab"
     )
 
 
@@ -23,7 +23,7 @@ async def handle_help() -> str:
         "/help - Show this help\n"
         "/health - Check backend status\n"
         "/labs - List available labs\n"
-        "/scores <lab> - Get scores for specific lab\n\n"
+        "/scores [lab] - Get scores for specific lab\n\n"
         "You can also ask questions in natural language:\n"
         '"What labs are available?"\n'
         '"Show my scores for lab-01"'
@@ -43,7 +43,7 @@ async def handle_labs() -> str:
         "• lab-02 - Bug Fixing\n"
         "• lab-03 - Feature Implementation\n"
         "• lab-04 - API Development\n\n"
-        "Use /scores <lab> to see your progress."
+        "Use /scores [lab] to see your progress."
     )
 
 
