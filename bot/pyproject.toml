@@ -2,7 +2,6 @@
 name = "se-toolkit-lab-7-bot"
 version = "0.1.0"
 description = "Telegram bot for Learning Management System analytics"
-readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "aiogram>=3.15.0",
