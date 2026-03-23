@@ -39,6 +39,13 @@ class LMSAPIClient:
         response.raise_for_status()
         return response.json()
 
+    async def get_pass_rates(self, lab: str) -> list[dict]:
+        """Get pass rates for a specific lab."""
+        client = await self._get_client()
+        response = await client.get(f'/analytics/pass-rates?lab={lab}')
+        response.raise_for_status()
+        return response.json()
+
     async def get_analytics(self) -> dict | None:
         """Get analytics data."""
         client = await self._get_client()
