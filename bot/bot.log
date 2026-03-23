@@ -1,3 +1,5 @@
 nohup: ignoring input
 Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
 Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8226868300)
+Received SIGTERM signal
+Received SIGTERM signal
