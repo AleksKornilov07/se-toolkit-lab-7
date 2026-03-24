@@ -4,7 +4,7 @@ Telegram Bot for Learning Management System.
 
 Usage:
     uv run bot.py                  # Run Telegram bot
-    uv run bot.py --test "/start"  # Test mode (no Telegram connection)
+    uv run bot.py --test "hello"   # Test mode (no Telegram connection)
 """
 
 import asyncio
@@ -30,60 +30,42 @@ from services import lms_client, llm_client
 # -----------------------------------------------------------------------------
 
 
-async def run_test_mode(command: str) -> None:
+async def run_test_mode(message: str) -> None:
     """
-    Run bot in test mode - call handlers directly without Telegram.
+    Run bot in test mode - use LLM routing directly.
 
     Args:
-        command: Command string like "/start" or "/scores lab-01"
+        message: Message string like "/start" or "which lab has the lowest pass rate"
     """
-    parts = command.strip().split(maxsplit=1)
-    cmd = parts[0].lower()
-    arg = parts[1] if len(parts) > 1 else ""
+    text = message.strip()
 
-    response: Optional[str] = None
+    # Handle slash commands directly
+    if text.startswith("/"):
+        parts = text.split(maxsplit=1)
+        cmd = parts[0].lower()
+        arg = parts[1] if len(parts) > 1 else ""
 
-    # Route to appropriate handler
-    if cmd == "/start":
-        response = await handle_start()
-    elif cmd == "/help":
-        response = await handle_help()
-    elif cmd == "/health":
-        # Check backend health
-        is_healthy = await lms_client.health_check()
-        if is_healthy:
-            response = "✅ Bot is running. Backend connection: OK"
+        response: Optional[str] = None
+
+        if cmd == "/start":
+            response = await handle_start()
+        elif cmd == "/help":
+            response = await handle_help()
+        elif cmd == "/health":
+            is_healthy = await lms_client.health_check()
+            response = "✅ Bot is running. Backend connection: OK" if is_healthy else "⚠️ Bot is running. Backend connection: FAILED"
+        elif cmd == "/labs":
+            response = await handle_labs()
+        elif cmd == "/scores":
+            response = await handle_scores(arg)
         else:
-            response = "⚠️ Bot is running. Backend connection: FAILED"
-    elif cmd == "/labs":
-        response = await handle_labs()
-    elif cmd == "/scores":
-        response = await handle_scores(arg)
-    else:
-        # Try LLM intent classification for natural language
-        intent = await llm_client.classify_intent(command)
-        if intent != "unknown":
-            # Re-route based on classified intent
-            if intent == "start":
-                response = await handle_start()
-            elif intent == "help":
-                response = await handle_help()
-            elif intent == "health":
-                is_healthy = await lms_client.health_check()
-                response = "✅ Backend OK" if is_healthy else "⚠️ Backend FAILED"
-            elif intent == "labs":
-                response = await handle_labs()
-            elif intent == "scores":
-                # Extract lab name from message using LLM
-                response = await llm_client.answer_question(
-                    command,
-                    "Available labs: lab-01, lab-02, lab-03, lab-04"
-                )
-        else:
-            # General question - use LLM
-            response = await llm_client.answer_question(command)
+            response = f"Unknown command: {cmd}"
 
-    # Print response to stdout
+        print(response)
+        return
+
+    # Natural language - use LLM routing
+    response = await llm_client.route(text, lms_client)
     print(response)
 
 
@@ -105,12 +87,12 @@ def register_handlers(dp: Dispatcher) -> None:
     @dp.message(CommandStart())
     async def cmd_start(message: types.Message) -> None:
         response = await handle_start()
-        await message.answer(response)
+        await message.answer(response, reply_markup=await get_main_keyboard())
 
     @dp.message(Command("help"))
     async def cmd_help(message: types.Message) -> None:
         response = await handle_help()
-        await message.answer(response)
+        await message.answer(response, reply_markup=await get_main_keyboard())
 
     @dp.message(Command("health"))
     async def cmd_health(message: types.Message) -> None:
@@ -135,30 +117,29 @@ def register_handlers(dp: Dispatcher) -> None:
 
     @dp.message()
     async def handle_message(message: types.Message) -> None:
-        """Handle natural language messages with LLM intent routing."""
+        """Handle natural language messages with LLM tool routing."""
         text = message.text or ""
 
-        # Classify intent
-        intent = await llm_client.classify_intent(text)
-
-        if intent == "start":
-            response = await handle_start()
-        elif intent == "help":
-            response = await handle_help()
-        elif intent == "health":
-            is_healthy = await lms_client.health_check()
-            response = "✅ Backend OK" if is_healthy else "⚠️ Backend FAILED"
-        elif intent == "labs":
-            response = await handle_labs()
-        elif intent == "scores":
-            # Use LLM to extract lab name and generate response
-            context = "Available labs: lab-01, lab-02, lab-03, lab-04"
-            response = await llm_client.answer_question(text, context)
-        else:
-            # General question
-            response = await llm_client.answer_question(text)
-
+        # Use LLM routing with tool calling
+        response = await llm_client.route(text, lms_client)
         await message.answer(response)
+
+
+async def get_main_keyboard() -> types.InlineKeyboardMarkup:
+    """Create inline keyboard with common actions."""
+    keyboard = types.InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                types.InlineKeyboardButton(text="📚 Labs", callback_data="labs"),
+                types.InlineKeyboardButton(text="📊 Scores", callback_data="scores"),
+            ],
+            [
+                types.InlineKeyboardButton(text="💚 Health", callback_data="health"),
+                types.InlineKeyboardButton(text="❓ Help", callback_data="help"),
+            ],
+        ]
+    )
+    return keyboard
 
 
 async def run_telegram_mode() -> None:
@@ -188,12 +169,12 @@ async def main() -> None:
     # Check for test mode
     if len(sys.argv) > 1 and sys.argv[1] == "--test":
         if len(sys.argv) < 3:
-            print("Usage: uv run bot.py --test <command>")
-            print("Example: uv run bot.py --test '/start'")
+            print("Usage: uv run bot.py --test <message>")
+            print("Example: uv run bot.py --test 'what labs are available'")
             sys.exit(1)
 
-        command = sys.argv[2]
-        await run_test_mode(command)
+        message = sys.argv[2]
+        await run_test_mode(message)
         return
 
     # Run Telegram bot
