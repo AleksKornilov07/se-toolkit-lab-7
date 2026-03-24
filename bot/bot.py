@@ -76,7 +76,13 @@ async def run_test_mode(message: str) -> None:
 
 async def setup_bot() -> tuple[Bot, Dispatcher]:
     """Initialize bot and dispatcher."""
-    bot = Bot(token=settings.bot_token, parse_mode="HTML")
+    from aiogram.client.default import DefaultBotProperties
+    from aiogram.enums import ParseMode
+
+    bot = Bot(
+        token=settings.bot_token,
+        default=DefaultBotProperties(parse_mode=ParseMode.HTML),
+    )
     dp = Dispatcher()
     return bot, dp
 
