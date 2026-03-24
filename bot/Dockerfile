@@ -46,5 +46,5 @@ USER nonroot
 
 WORKDIR /app
 
-# Run the bot
-CMD ["bot/bot.py"]
+# Run the bot with Python
+CMD ["python", "bot/bot.py"]

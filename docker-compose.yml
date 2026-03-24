@@ -94,6 +94,7 @@ services:
     restart: unless-stopped
     networks:
       - lms-network
+    command: [ "python", "bot/bot.py" ]
     environment:
       - BOT_TOKEN=${BOT_TOKEN:?'BOT_TOKEN is required'}
       - LMS_API_BASE_URL=http://backend:${BACKEND_CONTAINER_PORT}
