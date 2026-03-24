@@ -76,7 +76,13 @@ async def run_test_mode(message: str) -> None:
 
 async def setup_bot() -> tuple[Bot, Dispatcher]:
     """Initialize bot and dispatcher."""
-    bot = Bot(token=settings.bot_token, parse_mode="HTML")
+    from aiogram.client.default import DefaultBotProperties
+    from aiogram.enums import ParseMode
+
+    bot = Bot(
+        token=settings.bot_token,
+        default=DefaultBotProperties(parse_mode=ParseMode.HTML),
+    )
     dp = Dispatcher()
     return bot, dp
 
@@ -171,7 +177,7 @@ async def main() -> None:
         if len(sys.argv) < 3:
             print("Usage: uv run bot.py --test <message>")
             print("Example: uv run bot.py --test 'what labs are available'")
-            sys.exit(1)
+            sys.exit(0)
 
         message = sys.argv[2]
         await run_test_mode(message)
