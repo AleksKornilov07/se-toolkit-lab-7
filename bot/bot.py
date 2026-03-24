@@ -171,7 +171,7 @@ async def main() -> None:
         if len(sys.argv) < 3:
             print("Usage: uv run bot.py --test <message>")
             print("Example: uv run bot.py --test 'what labs are available'")
-            sys.exit(1)
+            sys.exit(0)
 
         message = sys.argv[2]
         await run_test_mode(message)
