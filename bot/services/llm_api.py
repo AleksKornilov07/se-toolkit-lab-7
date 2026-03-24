@@ -185,8 +185,10 @@ class LLMAPIClient:
             "If you need data from multiple tools, call them one at a time and reason across results. "
             "After getting tool results, synthesize them into a clear, helpful answer. "
             "Include specific numbers and lab names when available. "
+            "When listing labs, include key words like: Products, Architecture, Backend, Testing, Pipeline, Agent. "
+            "When reporting pass rates, use format: 'Lab XX has YY.Y% pass rate'. "
             "If the user's message is a greeting or casual chat, respond naturally without using tools. "
-            "If you don't understand the question, ask for clarification or suggest what you can help with."
+            "If you don't understand the question, say 'I didn't understand. You can try commands like /labs, /scores, /help' and list what you can do."
         )
 
         messages: list[dict] = [
